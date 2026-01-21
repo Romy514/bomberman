@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=3 uid="uid://bnn3x2avb2qgx"]
+
+[ext_resource type="Script" uid="uid://dkrk2wl3cj2a" path="res://personnage/control_joueur.gd" id="1_y2fhv"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_80cej"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_y2fhv"]
+
+[node name="Personnage" type="CharacterBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.957855, -0.010406256)
+shape = SubResource("CylinderShape3D_80cej")
+debug_color = Color(0, 0.36078432, 0.42745098, 1)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D"]
+mesh = SubResource("CapsuleMesh_y2fhv")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="CollisionShape3D"]
+transform = Transform3D(-2.1855694e-08, 0.5, -2.1855694e-08, 0, -2.1855694e-08, -0.5, -0.5, -2.1855694e-08, 9.553427e-16, 0, 0.32570505, -0.43886912)
+mesh = SubResource("CapsuleMesh_y2fhv")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="CollisionShape3D"]
+transform = Transform3D(-2.1855694e-08, -4.371139e-08, -0.5, 0, -0.5, 4.371139e-08, -0.5, 1.9106855e-15, 2.1855694e-08, -8.881784e-15, 0.100786686, 0.6055852)
+mesh = SubResource("CapsuleMesh_y2fhv")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="control_joueur" type="Node" parent="."]
+script = ExtResource("1_y2fhv")
+
+[connection signal="input_event" from="." to="control_joueur" method="_on_personnage_input_event"]
