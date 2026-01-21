@@ -1,11 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://b5tp13c4iwq6i"]
+[gd_scene load_steps=10 format=3 uid="uid://b5tp13c4iwq6i"]
 
 [ext_resource type="PackedScene" uid="uid://bnn3x2avb2qgx" path="res://personnage/personnage.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://b8s8vbxflq26c" path="res://murs/mur_indestructible.tscn" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://dx86xd8q3q4qw" path="res://murs/mur_destructible.tscn" id="3_1bvp3"]
-[ext_resource type="PackedScene" path="res://ui/game_over.tscn" id="4_gameover"]
+[ext_resource type="PackedScene" uid="uid://d2oidihi06dy0" path="res://ui/game_over.tscn" id="4_gameover"]
 [ext_resource type="Script" uid="uid://cg4vkoerkpkbq" path="res://main.gd" id="5_main"]
 [ext_resource type="PackedScene" uid="uid://ryrd8djw45aa" path="res://ennemis/enemy.tscn" id="6_enemy"]
+[ext_resource type="Script" uid="uid://c6pfj2koivygv" path="res://level_generator.gd" id="7_levelgen"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ig7tw"]
 size = Vector3(20, 1, 20)
@@ -14,7 +15,6 @@ size = Vector3(20, 1, 20)
 size = Vector3(20, 0.1, 20)
 
 [node name="bomberman" type="Node3D"]
-transform = Transform3D(0.99992234, -0.012461329, 0, 0.012461329, 0.99992234, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("5_main")
 
 [node name="Personnage" parent="." instance=ExtResource("1_ig7tw")]
@@ -38,6 +38,15 @@ shadow_enabled = true
 transform = Transform3D(0.99982417, -0.0141275115, 0.012349291, -0.0141275115, -0.13361987, 0.99093217, -0.012349289, -0.990932, -0.13379592, 7.450581e-09, 5.0000005, 0)
 current = true
 
+[node name="LevelGenerator" type="Node3D" parent="."]
+script = ExtResource("7_levelgen")
+level_width = 13
+level_height = 13
+grid_size = 1.0
+destructible_wall_scene = ExtResource("3_1bvp3")
+indestructible_wall_scene = ExtResource("2_h2yge")
+enemy_scene = ExtResource("6_enemy")
+
 [node name="MurIndestructible2" parent="." instance=ExtResource("2_h2yge")]
 transform = Transform3D(1.0000005, 2.7939677e-09, 0, -2.7939677e-09, 1.0000005, 0, 0, 0, 1, 0, 0, -10)
 
@@ -49,11 +58,5 @@ transform = Transform3D(-4.371141e-08, 0, 1.0000001, 0, 1.0000006, 0, -1.0000005
 
 [node name="MurIndestructible" parent="." instance=ExtResource("2_h2yge")]
 transform = Transform3D(1.0000002, 9.313226e-10, 0, -9.313226e-10, 1.0000002, 0, 0, 0, 1, 0, 0, 10)
-
-[node name="MurDestructible" parent="." instance=ExtResource("3_1bvp3")]
-transform = Transform3D(1.0000001, 9.313226e-10, 0, -9.313226e-10, 1.0000001, 0, 0, 0, 1, 3.7589676, -0.046845373, 0)
-
-[node name="Enemy" parent="." instance=ExtResource("6_enemy")]
-transform = Transform3D(1.0000001, 9.313226e-10, 0, -9.313226e-10, 1.0000001, 0, 0, 0, 1, 0, 0, 4.6601715)
 
 [node name="GameOverUI" parent="." instance=ExtResource("4_gameover")]
