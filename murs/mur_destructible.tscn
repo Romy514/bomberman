@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://dx86xd8q3q4qw"]
+
+[ext_resource type="Script" path="res://murs/mur_destructible.gd" id="1_0qlr1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0qlr1"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0qlr1"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0qlr1"]
+albedo_color = Color(1, 1, 0, 1)
+
+[node name="MurDestructible" type="StaticBody3D"]
+script = ExtResource("1_0qlr1")
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_0qlr1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_0qlr1")
+material_override = SubResource("StandardMaterial3D_0qlr1")
