@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://b5tp13c4iwq6i"]
+[gd_scene load_steps=9 format=3 uid="uid://b5tp13c4iwq6i"]
 
 [ext_resource type="PackedScene" uid="uid://bnn3x2avb2qgx" path="res://personnage/personnage.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://b8s8vbxflq26c" path="res://murs/mur_indestructible.tscn" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://dx86xd8q3q4qw" path="res://murs/mur_destructible.tscn" id="3_1bvp3"]
 [ext_resource type="PackedScene" path="res://ui/game_over.tscn" id="4_gameover"]
-[ext_resource type="Script" path="res://main.gd" id="5_main"]
+[ext_resource type="Script" uid="uid://cg4vkoerkpkbq" path="res://main.gd" id="5_main"]
+[ext_resource type="PackedScene" uid="uid://ryrd8djw45aa" path="res://ennemis/enemy.tscn" id="6_enemy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ig7tw"]
 size = Vector3(20, 1, 20)
@@ -13,8 +14,8 @@ size = Vector3(20, 1, 20)
 size = Vector3(20, 0.1, 20)
 
 [node name="bomberman" type="Node3D"]
-script = ExtResource("5_main")
 transform = Transform3D(0.99992234, -0.012461329, 0, 0.012461329, 0.99992234, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("5_main")
 
 [node name="Personnage" parent="." instance=ExtResource("1_ig7tw")]
 
@@ -51,5 +52,8 @@ transform = Transform3D(1.0000002, 9.313226e-10, 0, -9.313226e-10, 1.0000002, 0,
 
 [node name="MurDestructible" parent="." instance=ExtResource("3_1bvp3")]
 transform = Transform3D(1.0000001, 9.313226e-10, 0, -9.313226e-10, 1.0000001, 0, 0, 0, 1, 3.7589676, -0.046845373, 0)
+
+[node name="Enemy" parent="." instance=ExtResource("6_enemy")]
+transform = Transform3D(1.0000001, 9.313226e-10, 0, -9.313226e-10, 1.0000001, 0, 0, 0, 1, 0, 0, 4.6601715)
 
 [node name="GameOverUI" parent="." instance=ExtResource("4_gameover")]

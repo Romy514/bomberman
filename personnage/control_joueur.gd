@@ -21,9 +21,12 @@ var bombs_placed: Array = []  # Liste des bombes posées
 
 # Paramètres de vie (US10, US11, US12)
 @export var max_lives: int = 3
+@export var invincibility_duration: float = 2.0  # Durée d'invincibilité après dégâts
 var current_lives: int
 var spawn_position: Vector3
 var is_alive: bool = true
+var is_invincible: bool = false
+var invincibility_timer: float = 0.0
 
 # Variables de mouvement
 var current_grid_position: Vector3
@@ -52,6 +55,14 @@ func _process(delta: float) -> void:
 	if camera != null:
 		update_camera()
 	
+	# Gestion de l'invincibilité
+	if is_invincible:
+		invincibility_timer -= delta
+		update_invincibility_animation()
+		if invincibility_timer <= 0.0:
+			is_invincible = false
+			reset_invincibility_animation()
+	
 	# Gestion des bombes (US05, US06)
 	if is_alive and Input.is_action_just_pressed("p_bomb"):
 		place_bomb()
@@ -62,6 +73,7 @@ func _physics_process(delta: float) -> void:
 		return
 	handle_player_movement(delta)
 	joueur.move_and_slide()
+	check_enemy_contact()
 
 
 func handle_player_movement(delta: float) -> void:
@@ -144,6 +156,30 @@ func is_collision_at(position: Vector3) -> bool:
 	return false
 
 
+func check_enemy_contact() -> void:
+	"""Detecte un contact direct avec un ennemi (US14)."""
+	# Ne pas prendre de dégâts si invincible
+	if is_invincible:
+		return
+	
+	var space_state = joueur.get_world_3d().direct_space_state
+	var query = PhysicsShapeQueryParameters3D.new()
+	var shape = SphereShape3D.new()
+	shape.radius = max(grid_size * 0.6, 0.8)
+
+	query.shape = shape
+	var origin = joueur.global_position
+	origin.y = 0  # aligner au sol pour toucher les ennemis centrés à y=0
+	query.transform.origin = origin
+
+	var result = space_state.intersect_shape(query)
+
+	for collision in result:
+		if collision.collider.is_in_group("enemy"):
+			apply_explosion_damage()
+			return
+
+
 func update_camera() -> void:
 	"""Met à jour la position de la caméra pour suivre le joueur."""
 	if camera == null:
@@ -156,14 +192,14 @@ func update_camera() -> void:
 
 func apply_explosion_damage() -> void:
 	"""Applique des dégâts au joueur lorsqu'il est touché par une explosion (US10)."""
-	if not is_alive:
+	if not is_alive or is_invincible:
 		return
 	current_lives -= 1
 	print("Joueur touché! Vies restantes: ", current_lives)
+	is_invincible = true
+	invincibility_timer = invincibility_duration
 	if current_lives <= 0:
 		game_over()
-	else:
-		respawn_player()
 
 
 func respawn_player() -> void:
@@ -181,8 +217,10 @@ func game_over() -> void:
 	"""Fin de partie quand il n'y a plus de vies (US11)."""
 	is_alive = false
 	is_moving = false
+	is_invincible = false
 	joueur.velocity = Vector3.ZERO
 	print("Game Over - plus de vies")
+	reset_invincibility_animation()
 	emit_signal("game_over_signal")
 
 
@@ -224,3 +262,16 @@ func is_bomb_at(position: Vector3) -> bool:
 		if bomb.grid_position.distance_to(position) < grid_size * 0.5:
 			return true
 	return false
+
+
+func update_invincibility_animation() -> void:
+	"""Anime le joueur pendant l'invincibilité (pulsing de la scale)."""
+	# Faire pulser la scale du joueur
+	var animation_speed = 0.1
+	var pulse = sin(get_tree().get_frame() * animation_speed) * 0.15 + 0.85
+	joueur.scale = Vector3.ONE * pulse
+
+
+func reset_invincibility_animation() -> void:
+	"""Restaure l'apparence normale du joueur."""
+	joueur.scale = Vector3.ONE

@@ -97,6 +97,7 @@ func propagate_explosion() -> void:
 	
 	# Impact immédiat sur la case de la bombe
 	hit_player_at(grid_position)
+	hit_enemy_at(grid_position)
 
 	# Pour chaque direction
 	for direction in directions:
@@ -111,6 +112,7 @@ func propagate_explosion() -> void:
 			# Créer une explosion à cette position
 			create_explosion_at(explosion_position)
 			hit_player_at(explosion_position)
+			hit_enemy_at(explosion_position)
 			
 			# Vérifier s'il y a un mur destructible et l'explosion s'arrête après (US09)
 			if is_destructible_wall_at(explosion_position):
@@ -192,6 +194,25 @@ func hit_player_at(position: Vector3) -> void:
 			var control = collision.collider.get_node_or_null("control_joueur")
 			if control and control.has_method("apply_explosion_damage"):
 				control.apply_explosion_damage()
+
+
+func hit_enemy_at(position: Vector3) -> void:
+	"""Vérifie si un ennemi est touché par l'explosion (US15)."""
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsShapeQueryParameters3D.new()
+	var shape = SphereShape3D.new()
+	shape.radius = grid_size * 0.45
+
+	query.shape = shape
+	query.transform.origin = position
+
+	var result = space_state.intersect_shape(query)
+
+	for collision in result:
+		if collision.collider.is_in_group("enemy"):
+			print("Ennemi touché par l'explosion!")
+			if collision.collider.has_method("die"):
+				collision.collider.die()
 
 
 func set_position_from_grid(pos: Vector3) -> void:
