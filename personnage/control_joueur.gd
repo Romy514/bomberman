@@ -12,7 +12,7 @@ signal game_over_signal
 @export var level_bounds: Vector3 = Vector3(10, 10, 10)
 
 # Paramètres de la caméra
-@export var camera_offset: Vector3 = Vector3(5, 5, 5)
+@export var camera_offset: Vector3 = Vector3(0, 15, 0)  # Vue du dessus
 
 # Paramètres de bombes (US05)
 @export var bomb_scene: PackedScene
@@ -181,13 +181,16 @@ func check_enemy_contact() -> void:
 
 
 func update_camera() -> void:
-	"""Met à jour la position de la caméra pour suivre le joueur."""
+	"""Met à jour la position de la caméra pour suivre le joueur - vue du dessus."""
 	if camera == null:
 		return
 	
+	# Positionner la caméra directement au-dessus du joueur
 	var camera_target_position = joueur.global_position + camera_offset
 	camera.global_position = camera.global_position.lerp(camera_target_position, 0.1)
-	camera.look_at(joueur.global_position + Vector3(0, 1, 0), Vector3.UP)
+	
+	# Regarder directement vers le bas
+	camera.look_at(joueur.global_position, Vector3(0, 0, -1))
 
 
 func apply_explosion_damage() -> void:
@@ -196,10 +199,14 @@ func apply_explosion_damage() -> void:
 		return
 	current_lives -= 1
 	print("Joueur touché! Vies restantes: ", current_lives)
-	is_invincible = true
-	invincibility_timer = invincibility_duration
+	
 	if current_lives <= 0:
 		game_over()
+	else:
+		# Réapparition à la position de spawn (US12)
+		respawn_player()
+		is_invincible = true
+		invincibility_timer = invincibility_duration
 
 
 func respawn_player() -> void:
@@ -236,6 +243,11 @@ func place_bomb() -> void:
 		print("Une bombe existe déjà à cette position!")
 		return
 	
+	# Vérifier qu'il n'y a pas de mur à cette position
+	if is_wall_at_position(current_grid_position):
+		print("Impossible de placer une bombe dans un mur!")
+		return
+	
 	# Créer la bombe
 	if bomb_scene == null:
 		print("Erreur: Scène de bombe non chargée!")
@@ -261,6 +273,25 @@ func is_bomb_at(position: Vector3) -> bool:
 	for bomb in bombs_placed:
 		if bomb.grid_position.distance_to(position) < grid_size * 0.5:
 			return true
+	return false
+
+
+func is_wall_at_position(position: Vector3) -> bool:
+	"""Vérifie s'il y a un mur (destructible ou indestructible) à une position."""
+	var space_state = joueur.get_world_3d().direct_space_state
+	var query = PhysicsShapeQueryParameters3D.new()
+	var shape = SphereShape3D.new()
+	shape.radius = grid_size * 0.3
+	
+	query.shape = shape
+	query.transform.origin = position
+	
+	var result = space_state.intersect_shape(query)
+	
+	for collision in result:
+		if collision.collider.is_in_group("destructible_wall") or collision.collider.is_in_group("indestructible_wall"):
+			return true
+	
 	return false
 
 
