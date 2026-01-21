@@ -17,9 +17,21 @@ signal game_over_signal
 # Paramètres de bombes (US05)
 @export var bomb_scene: PackedScene
 @export var max_bombs: int = 1
-# TODO Faire en sorte que l'on pose toujours au milieu de la "case" 2x2m
 @export var bomb_placement_distance: float = 2.0  # Distance devant le joueur pour poser la bombe (en mètres)
 var bombs_placed: Array = []  # Liste des bombes posées
+
+# Paramètres de bonus (US17, US18)
+var current_explosion_range: int = 3  # Portée des explosions (US18)
+var base_max_bombs: int = 1  # Valeur de base
+var base_explosion_range: int = 3  # Valeur de base
+
+# Timers de bonus temporaires
+var bomb_bonus_timer: float = 0.0
+var range_bonus_timer: float = 0.0
+var bonus_duration: float = 15.0  # Durée des bonus en secondes
+
+# Animation de bonus
+var active_bonus_type: String = ""  # "bomb" ou "range" ou ""
 
 # Paramètres de vie (US10, US11, US12)
 @export var max_lives: int = 3
@@ -46,6 +58,10 @@ func _ready() -> void:
 	spawn_position = current_grid_position
 	current_lives = max_lives
 	
+	# Initialiser les valeurs de base des bonus
+	base_max_bombs = max_bombs
+	base_explosion_range = current_explosion_range
+	
 	# Ajouter le joueur au groupe "joueur" pour les collisions d'explosions
 	joueur.add_to_group("joueur")
 	
@@ -65,6 +81,9 @@ func _process(delta: float) -> void:
 		if invincibility_timer <= 0.0:
 			is_invincible = false
 			reset_invincibility_animation()
+	
+	# Gestion des timers de bonus temporaires
+	update_bonus_timers(delta)
 	
 	# Gestion des bombes (US05, US06)
 	if is_alive and Input.is_action_just_pressed("p_bomb"):
@@ -258,14 +277,14 @@ func place_bomb() -> void:
 	bomb_position.x = round(bomb_position.x / grid_size) * grid_size
 	bomb_position.z = round(bomb_position.z / grid_size) * grid_size
 
+	# Vérifier qu'il n'y a pas de mur à cette position (destructible OU indestructible)
+	if is_wall_at_position(bomb_position):
+		print("Impossible de placer une bombe dans un mur!")
+		return
+
 	# Vérifier s'il y a déjà une bombe à cette position
 	if is_bomb_at(bomb_position):
 		print("Une bombe existe déjà à cette position!")
-		return
-
-	# Vérifier qu'il n'y a pas de mur à cette position
-	if is_wall_at_position(bomb_position):
-		print("Impossible de placer une bombe dans un mur!")
 		return
 
 	# Vérifier les limites
@@ -280,6 +299,7 @@ func place_bomb() -> void:
 	
 	var bomb = bomb_scene.instantiate()
 	bomb.grid_size = grid_size
+	bomb.explosion_range = current_explosion_range  # Appliquer la portée actuelle (US18)
 
 	# Ajouter d'abord à la scène, puis positionner en global
 	get_tree().root.get_child(0).add_child(bomb)
@@ -341,3 +361,91 @@ func update_orientation(dir: Vector3) -> void:
 	# Godot : forward = -Z. Yaw pour faire face à la direction entrée
 	var yaw = atan2(dir.x, -dir.z)
 	joueur.rotation.y = yaw
+
+
+func increase_max_bombs() -> void:
+	"""Augmente temporairement le nombre de bombes que le joueur peut poser (US17)."""
+	max_bombs += 1
+	bomb_bonus_timer = bonus_duration
+	active_bonus_type = "bomb"
+	print("Bonus bombes collecté! Nouveau max: ", max_bombs, " pour ", bonus_duration, "s")
+
+
+func increase_explosion_range() -> void:
+	"""Augmente temporairement la portée des explosions (US18)."""
+	current_explosion_range += 1
+	range_bonus_timer = bonus_duration
+	active_bonus_type = "range"
+	print("Bonus portée collecté! Nouvelle portée: ", current_explosion_range, " pour ", bonus_duration, "s")
+
+
+func update_bonus_timers(delta: float) -> void:
+	"""Met à jour les timers des bonus temporaires."""
+	# Timer du bonus de bombes
+	if bomb_bonus_timer > 0.0:
+		bomb_bonus_timer -= delta
+		if bomb_bonus_timer <= 0.0:
+			# Restaurer la valeur de base
+			max_bombs = base_max_bombs
+			bomb_bonus_timer = 0.0
+			print("Bonus bombes expiré! Retour à: ", max_bombs)
+			# Si c'était le bonus actif, retirer l'animation
+			if active_bonus_type == "bomb":
+				active_bonus_type = ""
+				reset_bonus_animation()
+	
+	# Timer du bonus de portée
+	if range_bonus_timer > 0.0:
+		range_bonus_timer -= delta
+		if range_bonus_timer <= 0.0:
+			# Restaurer la valeur de base
+			current_explosion_range = base_explosion_range
+			range_bonus_timer = 0.0
+			print("Bonus portée expiré! Retour à: ", current_explosion_range)
+			# Si c'était le bonus actif, retirer l'animation
+			if active_bonus_type == "range":
+				active_bonus_type = ""
+				reset_bonus_animation()
+	
+	# Appliquer l'animation de bonus si un bonus est actif
+	if active_bonus_type != "":
+		update_bonus_animation()
+
+
+func update_bonus_animation() -> void:
+	"""Applique une animation visuelle selon le bonus actif."""
+	var mesh_nodes = joueur.find_children("*", "MeshInstance3D")
+	if mesh_nodes.is_empty():
+		return
+	
+	for mesh_node in mesh_nodes:
+		var mesh_instance = mesh_node as MeshInstance3D
+		if mesh_instance == null:
+			continue
+		
+		# Créer un matériau avec une couleur selon le type de bonus
+		var material = StandardMaterial3D.new()
+		
+		if active_bonus_type == "bomb":
+			# Bleu pour le bonus de bombes
+			var pulse = sin(Time.get_ticks_msec() / 100.0) * 0.3 + 0.7
+			material.albedo_color = Color(0.2 * pulse, 0.5 * pulse, 1.0 * pulse)
+		elif active_bonus_type == "range":
+			# Orange pour le bonus de portée
+			var pulse = sin(Time.get_ticks_msec() / 100.0) * 0.3 + 0.7
+			material.albedo_color = Color(1.0 * pulse, 0.6 * pulse, 0.2 * pulse)
+		
+		material.emission_enabled = true
+		material.emission = material.albedo_color
+		material.emission_energy = 0.3
+		
+		mesh_instance.set_surface_override_material(0, material)
+
+
+func reset_bonus_animation() -> void:
+	"""Restaure l'apparence normale du joueur après expiration du bonus."""
+	var mesh_nodes = joueur.find_children("*", "MeshInstance3D")
+	for mesh_node in mesh_nodes:
+		var mesh_instance = mesh_node as MeshInstance3D
+		if mesh_instance:
+			mesh_instance.set_surface_override_material(0, null)
