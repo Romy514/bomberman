@@ -3,13 +3,13 @@
 [ext_resource type="Script" uid="uid://dm6afcislo261" path="res://murs/mur_indestructible.gd" id="1_0qlr1"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0qlr1"]
-size = Vector3(20, 2, 0.2)
+size = Vector3(2, 2, 0.2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0qlr1"]
 albedo_color = Color(0.5, 0.5, 0.5, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_0qlr1"]
-size = Vector3(20, 2, 0.2)
+size = Vector3(2, 2, 0.2)
 
 [node name="MurIndestructible" type="StaticBody3D"]
 script = ExtResource("1_0qlr1")

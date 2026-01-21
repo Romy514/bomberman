@@ -1,15 +1,13 @@
-[gd_scene load_steps=10 format=3 uid="uid://b5tp13c4iwq6i"]
+[gd_scene load_steps=8 format=3 uid="uid://b5tp13c4iwq6i"]
 
 [ext_resource type="PackedScene" uid="uid://bnn3x2avb2qgx" path="res://personnage/personnage.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://b8s8vbxflq26c" path="res://murs/mur_indestructible.tscn" id="2_h2yge"]
-[ext_resource type="PackedScene" uid="uid://dx86xd8q3q4qw" path="res://murs/mur_destructible.tscn" id="3_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://d2oidihi06dy0" path="res://ui/game_over.tscn" id="4_gameover"]
 [ext_resource type="Script" uid="uid://cg4vkoerkpkbq" path="res://main.gd" id="5_main"]
-[ext_resource type="PackedScene" uid="uid://ryrd8djw45aa" path="res://ennemis/enemy.tscn" id="6_enemy"]
 [ext_resource type="Script" uid="uid://c6pfj2koivygv" path="res://level_generator.gd" id="7_levelgen"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ig7tw"]
-size = Vector3(20, 1, 20)
+size = Vector3(20, 0.1, 20)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
 size = Vector3(20, 0.1, 20)
@@ -40,23 +38,137 @@ current = true
 
 [node name="LevelGenerator" type="Node3D" parent="."]
 script = ExtResource("7_levelgen")
-level_width = 13
-level_height = 13
-grid_size = 1.0
-destructible_wall_scene = ExtResource("3_1bvp3")
-indestructible_wall_scene = ExtResource("2_h2yge")
-enemy_scene = ExtResource("6_enemy")
-
-[node name="MurIndestructible2" parent="." instance=ExtResource("2_h2yge")]
-transform = Transform3D(1.0000005, 2.7939677e-09, 0, -2.7939677e-09, 1.0000005, 0, 0, 0, 1, 0, 0, -10)
-
-[node name="MurIndestructible3" parent="." instance=ExtResource("2_h2yge")]
-transform = Transform3D(-4.3711392e-08, 0, -1.0000001, 0, 1.0000002, 0, 1.0000001, 0, -4.3711392e-08, 10, 0, 0)
-
-[node name="MurIndestructible4" parent="." instance=ExtResource("2_h2yge")]
-transform = Transform3D(-4.371141e-08, 0, 1.0000001, 0, 1.0000006, 0, -1.0000005, 0, -4.3711392e-08, -10, 0, 0)
-
-[node name="MurIndestructible" parent="." instance=ExtResource("2_h2yge")]
-transform = Transform3D(1.0000002, 9.313226e-10, 0, -9.313226e-10, 1.0000002, 0, 0, 0, 1, 0, 0, 10)
 
 [node name="GameOverUI" parent="." instance=ExtResource("4_gameover")]
+
+[node name="walls" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+
+[node name="MurIndestructible" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 9)
+
+[node name="MurIndestructible2" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 7)
+
+[node name="MurIndestructible3" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 3)
+
+[node name="MurIndestructible4" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 5)
+
+[node name="MurIndestructible5" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 1)
+
+[node name="MurIndestructible6" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -1)
+
+[node name="MurIndestructible7" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -3)
+
+[node name="MurIndestructible8" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, -0.010628855, 0.9999435, -4.64602e-10, -0.9999435, -0.010628855, -4.370892e-08, 9.996, 1.1, -7)
+
+[node name="MurIndestructible9" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -5)
+
+[node name="MurIndestructible10" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -9)
+
+[node name="walls2" type="Node3D" parent="."]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -1, 0)
+
+[node name="MurIndestructible" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 9)
+
+[node name="MurIndestructible2" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 7)
+
+[node name="MurIndestructible3" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 3)
+
+[node name="MurIndestructible4" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 5)
+
+[node name="MurIndestructible5" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 1)
+
+[node name="MurIndestructible6" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -1)
+
+[node name="MurIndestructible7" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -3)
+
+[node name="MurIndestructible8" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, -0.010628855, 0.9999435, -4.64602e-10, -0.9999435, -0.010628855, -4.370892e-08, 9.996, 1.1, -7)
+
+[node name="MurIndestructible9" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -5)
+
+[node name="MurIndestructible10" parent="walls2" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -9)
+
+[node name="walls3" type="Node3D" parent="."]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -1, 0)
+
+[node name="MurIndestructible" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 9)
+
+[node name="MurIndestructible2" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 7)
+
+[node name="MurIndestructible3" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 3)
+
+[node name="MurIndestructible4" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 5)
+
+[node name="MurIndestructible5" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 1)
+
+[node name="MurIndestructible6" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -1)
+
+[node name="MurIndestructible7" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -3)
+
+[node name="MurIndestructible8" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, -0.010628855, 0.9999435, -4.64602e-10, -0.9999435, -0.010628855, -4.370892e-08, 9.996, 1.1, -7)
+
+[node name="MurIndestructible9" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -5)
+
+[node name="MurIndestructible10" parent="walls3" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -9)
+
+[node name="walls4" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, -1, 0)
+
+[node name="MurIndestructible" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 9)
+
+[node name="MurIndestructible2" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 7)
+
+[node name="MurIndestructible3" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 3)
+
+[node name="MurIndestructible4" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 5)
+
+[node name="MurIndestructible5" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 1.1, 1)
+
+[node name="MurIndestructible6" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -1)
+
+[node name="MurIndestructible7" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -3)
+
+[node name="MurIndestructible8" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, -0.010628855, 0.9999435, -4.64602e-10, -0.9999435, -0.010628855, -4.370892e-08, 9.996, 1.1, -7)
+
+[node name="MurIndestructible9" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -5)
+
+[node name="MurIndestructible10" parent="walls4" instance=ExtResource("2_h2yge")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9.996, 1.1, -9)

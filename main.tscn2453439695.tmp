@@ -1,0 +1,51 @@
+[gd_scene load_steps=8 format=3 uid="uid://b5tp13c4iwq6i"]
+
+[ext_resource type="PackedScene" uid="uid://bnn3x2avb2qgx" path="res://personnage/personnage.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://b8s8vbxflq26c" path="res://murs/mur_indestructible.tscn" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://d2oidihi06dy0" path="res://ui/game_over.tscn" id="4_gameover"]
+[ext_resource type="Script" uid="uid://cg4vkoerkpkbq" path="res://main.gd" id="5_main"]
+[ext_resource type="Script" uid="uid://c6pfj2koivygv" path="res://level_generator.gd" id="7_levelgen"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ig7tw"]
+size = Vector3(20, 1, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
+size = Vector3(20, 0.1, 20)
+
+[node name="bomberman" type="Node3D"]
+script = ExtResource("5_main")
+
+[node name="Personnage" parent="." instance=ExtResource("1_ig7tw")]
+
+[node name="ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
+shape = SubResource("BoxShape3D_ig7tw")
+
+[node name="ground" type="MeshInstance3D" parent="ground"]
+transform = Transform3D(1.0000001, 9.313226e-10, 0, -9.313226e-10, 1.0000001, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("BoxMesh_ig7tw")
+skeleton = NodePath("../..")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1.0000001, 0, 0, 0, -4.3711392e-08, 1, 0, -1.0000001, -4.371139e-08, 7.450581e-09, 5.0000005, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.99982417, -0.0141275115, 0.012349291, -0.0141275115, -0.13361987, 0.99093217, -0.012349289, -0.990932, -0.13379592, 7.450581e-09, 5.0000005, 0)
+current = true
+
+[node name="LevelGenerator" type="Node3D" parent="."]
+script = ExtResource("7_levelgen")
+
+[node name="GameOverUI" parent="." instance=ExtResource("4_gameover")]
+
+[node name="walls" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+
+[node name="MurIndestructible2" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(1.0000005, 2.7939677e-09, 0, -2.7939677e-09, 1.0000005, 0, 0, 0, 1, 0, 0, -10)
+
+[node name="MurIndestructible3" parent="walls" instance=ExtResource("2_h2yge")]
+transform = Transform3D(1.0000005, 2.7939677e-09, 0, -2.7939677e-09, 1.0000005, 0, 0, 0, 1, 2, 0, -10)

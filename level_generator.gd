@@ -8,21 +8,23 @@ var game_state: String = "playing"  # playing, victory, defeat
 
 # Ressources
 @export var destructible_wall_scene: PackedScene
+@export var indestructible_wall_scene: PackedScene
 @export var enemy_scene: PackedScene
 
 # Paramètres
-@export var wall_removal_probability: float = 0.20  # Probabilité d'enlever une case
+@export var wall_removal_probability: float = 0.40  # Probabilité d'enlever une case destructible
+@export var indestructible_wall_probability: float = 0.20  # Probabilité d'ajouter un mur indestructible sur une case vide
 @export var num_enemies: int = 3
 
-# Grille 10x10 : 0 = vide, 1 = mur
+# Grille 10x10 : 0 = vide, 1 = mur destructible, 2 = mur indestructible
 var level_grid: Array = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 1, 1, 0, 0, 0, 1, 1, 1, 1],
-	[1, 1, 1, 0, 0, 0, 1, 1, 1, 1],
-	[1, 1, 1, 0, 0, 0, 1, 1, 1, 1],
+	[1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+	[1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -43,12 +45,18 @@ func generate_level() -> void:
 			# Aléatoirement enlever une case
 			if level_grid[y][x] == 1 and randf() < wall_removal_probability:
 				level_grid[y][x] = 0
+			
+			# Ajouter quelques murs indestructibles sur les cases vides
+			if level_grid[y][x] == 0 and randf() < indestructible_wall_probability:
+				level_grid[y][x] = 2
 	
 	# Placer les murs
 	for y in range(10):
 		for x in range(10):
 			if level_grid[y][x] == 1:
 				spawn_wall(x, y)
+			elif level_grid[y][x] == 2:
+				spawn_indestructible_wall(x, y)
 	
 	# Placer les ennemis
 	spawn_enemies()
@@ -61,6 +69,20 @@ func spawn_wall(x: int, z: int) -> void:
 	var wall = destructible_wall_scene.instantiate()
 	# Position mondiale : chaque index = 1 case de 2m
 	# Centrer la grille: (0,0) est au centre
+	var world_x = (x - 4.5) * tile_size
+	var world_z = (z - 4.5) * tile_size
+	wall.position = Vector3(world_x, 0, world_z)
+	add_child(wall)
+
+func spawn_indestructible_wall(x: int, z: int) -> void:
+	"""Instancie un mur indestructible à une position de grille."""
+	if indestructible_wall_scene == null:
+		indestructible_wall_scene = load("res://murs/mur_indestructible.tscn")
+
+	if indestructible_wall_scene == null:
+		return
+
+	var wall = indestructible_wall_scene.instantiate()
 	var world_x = (x - 4.5) * tile_size
 	var world_z = (z - 4.5) * tile_size
 	wall.position = Vector3(world_x, 0, world_z)
