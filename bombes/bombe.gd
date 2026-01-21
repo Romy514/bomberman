@@ -64,6 +64,9 @@ func explode() -> void:
 
 func create_explosion_effect() -> void:
 	"""Crée un effet visuel d'explosion."""
+	# Si la bombe est déjà sortie de l'arbre, ne pas créer d'effet
+	if not is_inside_tree():
+		return
 	# Créer une sphère rouge pour l'explosion
 	var explosion_mesh = SphereMesh.new()
 	explosion_mesh.radius = 0.5
@@ -79,8 +82,14 @@ func create_explosion_effect() -> void:
 	
 	var particle = Node3D.new()
 	particle.add_child(mesh_instance)
-	particle.global_position = grid_position
-	get_parent().add_child(particle)
+	particle.position = grid_position
+	
+	# Vérifier que le parent existe avant d'ajouter
+	var parent = get_parent()
+	if parent == null:
+		return
+	
+	parent.add_child(particle)
 	
 	# Animer et supprimer après 0.5 secondes
 	get_tree().create_timer(0.5).timeout.connect(func(): particle.queue_free())

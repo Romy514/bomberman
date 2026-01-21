@@ -17,6 +17,8 @@ signal game_over_signal
 # Paramètres de bombes (US05)
 @export var bomb_scene: PackedScene
 @export var max_bombs: int = 1
+# TODO Faire en sorte que l'on pose toujours au milieu de la "case" 2x2m
+@export var bomb_placement_distance: float = 2.0  # Distance devant le joueur pour poser la bombe (en mètres)
 var bombs_placed: Array = []  # Liste des bombes posées
 
 # Paramètres de vie (US10, US11, US12)
@@ -34,6 +36,7 @@ var target_grid_position: Vector3
 var is_moving: bool = false
 var movement_progress: float = 0.0
 var camera: Camera3D
+var last_move_dir: Vector3 = Vector3(0, 0, -1)
 
 func _ready() -> void:
 	current_grid_position = joueur.global_position
@@ -96,6 +99,8 @@ func handle_player_movement(delta: float) -> void:
 		
 		# Si une direction est pressée
 		if input_direction != Vector3.ZERO:
+			last_move_dir = input_direction.normalized()
+			update_orientation(last_move_dir)
 			# Calculer la prochaine position
 			var next_position = current_grid_position + (input_direction * grid_size)
 			
@@ -138,6 +143,11 @@ func is_within_bounds(position: Vector3) -> bool:
 
 func is_collision_at(position: Vector3) -> bool:
 	"""Vérifie s'il y a une collision à une position donnée."""
+	# Vérifier s'il y a une bombe à cette position
+	if is_bomb_at(position):
+		print("Collision avec une bombe à: ", position)
+		return true
+	
 	var space_state = joueur.get_world_3d().direct_space_state
 	var query = PhysicsShapeQueryParameters3D.new()
 	var shape = SphereShape3D.new()
@@ -232,20 +242,35 @@ func game_over() -> void:
 
 
 func place_bomb() -> void:
-	"""Place une bombe à la position actuelle du joueur (US05)."""
+	"""Place une bombe 1 case (2m) devant le joueur (US05)."""
 	# Vérifier si on a atteint la limite de bombes
 	if bombs_placed.size() >= max_bombs:
 		print("Nombre maximum de bombes atteint!")
 		return
 	
+	# Calculer la position cible devant le joueur
+	var dir = last_move_dir
+	if dir == Vector3.ZERO:
+		dir = Vector3(0, 0, -1)
+	var bomb_position = current_grid_position + dir.normalized() * bomb_placement_distance
+	
+	# Arrondir à la grille pour placer au centre de la case 2x2m
+	bomb_position.x = round(bomb_position.x / grid_size) * grid_size
+	bomb_position.z = round(bomb_position.z / grid_size) * grid_size
+
 	# Vérifier s'il y a déjà une bombe à cette position
-	if is_bomb_at(current_grid_position):
+	if is_bomb_at(bomb_position):
 		print("Une bombe existe déjà à cette position!")
 		return
-	
+
 	# Vérifier qu'il n'y a pas de mur à cette position
-	if is_wall_at_position(current_grid_position):
+	if is_wall_at_position(bomb_position):
 		print("Impossible de placer une bombe dans un mur!")
+		return
+
+	# Vérifier les limites
+	if not is_within_bounds(bomb_position):
+		print("Position de bombe hors limites: ", bomb_position)
 		return
 	
 	# Créer la bombe
@@ -254,14 +279,15 @@ func place_bomb() -> void:
 		return
 	
 	var bomb = bomb_scene.instantiate()
-	bomb.set_position_from_grid(current_grid_position)
 	bomb.grid_size = grid_size
-	
-	# Ajouter la bombe à la scène
+
+	# Ajouter d'abord à la scène, puis positionner en global
 	get_tree().root.get_child(0).add_child(bomb)
+	bomb.grid_position = bomb_position
+	bomb.global_position = bomb_position + Vector3(0, 0.25, 0)
 	bombs_placed.append(bomb)
 	
-	print("Bombe posée à: ", current_grid_position)
+	print("Bombe posée à: ", bomb_position)
 	
 	# Retirer la bombe de la liste quand elle explose
 	await bomb.tree_exited
@@ -306,3 +332,12 @@ func update_invincibility_animation() -> void:
 func reset_invincibility_animation() -> void:
 	"""Restaure l'apparence normale du joueur."""
 	joueur.scale = Vector3.ONE
+
+
+func update_orientation(dir: Vector3) -> void:
+	"""Tourne le joueur dans la direction du déplacement."""
+	if dir == Vector3.ZERO:
+		return
+	# Godot : forward = -Z. Yaw pour faire face à la direction entrée
+	var yaw = atan2(dir.x, -dir.z)
+	joueur.rotation.y = yaw
