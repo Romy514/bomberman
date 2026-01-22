@@ -13,7 +13,7 @@ func show_game_over() -> void:
 func show_victory() -> void:
 	"""Affiche l'écran de victoire (US21)."""
 	visible = true
-	get_tree().paused = true
+	#get_tree().paused = true
 	title_label.text = "VICTOIRE!"
 	title_label.add_theme_color_override("font_color", Color.GREEN)
 	info_label.text = "Tous les ennemis sont éliminés!"
@@ -23,7 +23,7 @@ func show_victory() -> void:
 func show_defeat() -> void:
 	"""Affiche l'écran de défaite (US21)."""
 	visible = true
-	get_tree().paused = true
+	#get_tree().paused = true
 	title_label.text = "GAME OVER"
 	title_label.add_theme_color_override("font_color", Color.RED)
 	info_label.text = "Tu as perdu toutes tes vies."
@@ -40,7 +40,6 @@ func _ready() -> void:
 	quit_button.pressed.connect(_on_quit_pressed)
 
 func _on_restart_pressed() -> void:
-	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 func _on_quit_pressed() -> void:
