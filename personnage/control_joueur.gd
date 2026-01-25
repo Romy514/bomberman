@@ -4,6 +4,9 @@ signal game_over_signal
 
 @onready var joueur: CharacterBody3D = get_parent()
 
+# Identifiant du joueur (1 ou 2)
+@export var player_id: int = 1  # 1 pour joueur 1, 2 pour joueur 2
+
 # Paramètres de déplacement et grille
 @export var grid_size: float = 1.0
 @export var move_duration: float = 0.2
@@ -64,6 +67,10 @@ func _ready() -> void:
 	
 	# Ajouter le joueur au groupe "joueur" pour les collisions d'explosions
 	joueur.add_to_group("joueur")
+	if player_id == 1:
+		joueur.add_to_group("joueur1")
+	else:
+		joueur.add_to_group("joueur2")
 	
 	# Charger la scène de bombe
 	if bomb_scene == null:
@@ -86,7 +93,8 @@ func _process(delta: float) -> void:
 	update_bonus_timers(delta)
 	
 	# Gestion des bombes (US05, US06)
-	if is_alive and Input.is_action_just_pressed("p_bomb"):
+	var bomb_action = "p_bomb" if player_id == 1 else "p2_bomb"
+	if is_alive and Input.is_action_just_pressed(bomb_action):
 		place_bomb()
 
 
@@ -106,14 +114,19 @@ func handle_player_movement(delta: float) -> void:
 	if not is_moving:
 		var input_direction = Vector3.ZERO
 		
-		# Récupérer les entrées
-		if Input.is_action_pressed("p_front"):
+		# Récupérer les entrées selon le joueur
+		var front_action = "p_front" if player_id == 1 else "p2_front"
+		var back_action = "p_back" if player_id == 1 else "p2_back"
+		var right_action = "p_right" if player_id == 1 else "p2_right"
+		var left_action = "p_left" if player_id == 1 else "p2_left"
+		
+		if Input.is_action_pressed(front_action):
 			input_direction.z -= 1
-		elif Input.is_action_pressed("p_back"):
+		elif Input.is_action_pressed(back_action):
 			input_direction.z += 1
-		elif Input.is_action_pressed("p_right"):
+		elif Input.is_action_pressed(right_action):
 			input_direction.x += 1
-		elif Input.is_action_pressed("p_left"):
+		elif Input.is_action_pressed(left_action):
 			input_direction.x -= 1
 		
 		# Si une direction est pressée
@@ -215,12 +228,24 @@ func update_camera() -> void:
 	if camera == null:
 		return
 	
-	# Positionner la caméra directement au-dessus du joueur
-	var camera_target_position = joueur.global_position + camera_offset
+	# Chercher les joueurs actifs
+	var all_players = get_tree().get_nodes_in_group("joueur")
+	var target_position = joueur.global_position
+	
+	# Si plusieurs joueurs, calculer le point central
+	if all_players.size() > 1:
+		var center = Vector3.ZERO
+		for player in all_players:
+			center += player.global_position
+		center /= all_players.size()
+		target_position = center
+	
+	# Positionner la caméra directement au-dessus du point cible
+	var camera_target_position = target_position + camera_offset
 	camera.global_position = camera.global_position.lerp(camera_target_position, 0.1)
 	
 	# Regarder directement vers le bas
-	camera.look_at(joueur.global_position, Vector3(0, 0, -1))
+	camera.look_at(target_position, Vector3(0, 0, -1))
 
 
 func apply_explosion_damage() -> void:
