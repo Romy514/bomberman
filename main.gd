@@ -24,6 +24,14 @@ func _ready() -> void:
 	var player = get_node_or_null("Personnage")
 	if player:
 		player.global_position = Vector3(0, 0, 0)
+		
+		# Appliquer l'apparence visuelle au joueur 1 (violet)
+		var visual_script = load("res://personnage/player_visual.gd")
+		if visual_script:
+			var visual_node = Node.new()
+			visual_node.set_script(visual_script)
+			visual_node.set("player_id", 1)
+			player.add_child(visual_node)
 	
 	if player_control and player_control.has_signal("game_over_signal"):
 		player_control.connect("game_over_signal", Callable(self, "_on_player1_game_over"))

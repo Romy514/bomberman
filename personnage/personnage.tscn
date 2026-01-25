@@ -1,25 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bnn3x2avb2qgx"]
+[gd_scene load_steps=4 format=3 uid="uid://bnn3x2avb2qgx"]
 
 [ext_resource type="Script" uid="uid://dkrk2wl3cj2a" path="res://personnage/control_joueur.gd" id="1_y2fhv"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_80cej"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y2fhv"]
-albedo_color = Color(0.84705883, 0.28627452, 0.62352943, 1)
-metallic = 0.55
-roughness = 0.7
-
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_y2fhv"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1rlr6"]
-albedo_color = Color(0.45915115, 0.542919, 0.6352681, 1)
-metallic = 0.29
-roughness = 0.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ontt2"]
-albedo_color = Color(0.84666073, 0.28466535, 0.6229988, 1)
-metallic = 0.2
-roughness = 0.7
 
 [node name="Personnage" type="CharacterBody3D"]
 
@@ -29,18 +14,15 @@ shape = SubResource("CylinderShape3D_80cej")
 debug_color = Color(0, 0.36078432, 0.42745098, 1)
 
 [node name="Body" type="MeshInstance3D" parent="CollisionShape3D"]
-material_override = SubResource("StandardMaterial3D_y2fhv")
 mesh = SubResource("CapsuleMesh_y2fhv")
 
 [node name="Glasses" type="MeshInstance3D" parent="CollisionShape3D"]
 transform = Transform3D(-2.1855694e-08, 0.5, -2.1855694e-08, 0, -2.1855694e-08, -0.5, -0.5, -2.1855694e-08, 9.553427e-16, 0, 0.32570505, -0.43886912)
-material_override = SubResource("StandardMaterial3D_1rlr6")
 mesh = SubResource("CapsuleMesh_y2fhv")
 skeleton = NodePath("../Body")
 
 [node name="backpack" type="MeshInstance3D" parent="CollisionShape3D"]
 transform = Transform3D(-2.1855694e-08, -4.371139e-08, -0.5, 0, -0.5, 4.371139e-08, -0.5, 1.9106855e-15, 2.1855694e-08, -8.881784e-15, 0.100786686, 0.6055852)
-material_override = SubResource("StandardMaterial3D_ontt2")
 mesh = SubResource("CapsuleMesh_y2fhv")
 skeleton = NodePath("../Body")
 
