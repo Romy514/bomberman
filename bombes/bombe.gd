@@ -12,6 +12,11 @@ var time_until_explosion: float = 0.0
 var has_exploded: bool = false
 var grid_position: Vector3  # Position sur la grille
 
+# État de glissement
+var is_sliding: bool = false
+var slide_direction: Vector3
+var slide_speed: float = 5.0
+
 # Références
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
@@ -23,17 +28,31 @@ func _ready() -> void:
 	print("Bombe posée à: ", grid_position)
 
 
+func start_sliding(direction: Vector3) -> void:
+	"""Démarre le glissement de la bombe dans une direction donnée."""
+	if is_sliding or has_exploded:
+		return
+
+	is_sliding = true
+	slide_direction = direction.normalized()
+	print("Bombe commence à glisser dans la direction: ", slide_direction)
+
+
 func _process(delta: float) -> void:
 	if not has_exploded:
-		# Compter le temps avant explosion (US06)
-		time_until_explosion -= delta
-		
-		# Animation de la bombe (scintillement)
-		update_bomb_animation()
-		
-		# Exploser si délai écoulé
-		if time_until_explosion <= 0.0:
-			explode()
+		# Gérer le glissement si en cours
+		if is_sliding:
+			handle_sliding(delta)
+		else:
+			# Compter le temps avant explosion (US06)
+			time_until_explosion -= delta
+
+			# Animation de la bombe (scintillement)
+			update_bomb_animation()
+
+			# Exploser si délai écoulé
+			if time_until_explosion <= 0.0:
+				explode()
 
 
 func update_bomb_animation() -> void:
@@ -42,6 +61,35 @@ func update_bomb_animation() -> void:
 	var pulse = sin(get_tree().get_frame() * animation_speed) * 0.2 + 0.8
 	if mesh:
 		mesh.scale = Vector3.ONE * pulse
+
+
+func handle_sliding(delta: float) -> void:
+	"""Gère le mouvement de glissement de la bombe."""
+	var move_distance = slide_speed * delta
+	var new_position = global_position + slide_direction * move_distance
+
+	# Vérifier si on peut glisser à cette position
+	if can_slide_to(new_position):
+		global_position = new_position
+		grid_position = global_position
+	else:
+		# Obstacle détecté, exploser
+		print("Bombe heurte un obstacle et explose à: ", grid_position)
+		explode()
+
+
+func can_slide_to(position: Vector3) -> bool:
+	"""Vérifie si la bombe peut glisser à une position donnée."""
+	# Vérifier les limites du niveau (utiliser les mêmes que le joueur)
+	var level_bounds = Vector3(10, 10, 10)  # À adapter selon vos besoins
+	if abs(position.x) > level_bounds.x or abs(position.z) > level_bounds.z:
+		return false
+
+	# Vérifier s'il y a un mur (indestructible OU destructible)
+	if is_wall_at(position) or is_destructible_wall_at(position):
+		return false
+
+	return true
 
 
 func explode() -> void:

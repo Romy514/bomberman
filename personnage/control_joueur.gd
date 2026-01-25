@@ -161,27 +161,28 @@ func is_within_bounds(position: Vector3) -> bool:
 
 
 func is_collision_at(position: Vector3) -> bool:
-	"""Vérifie s'il y a une collision à une position donnée."""
 	# Vérifier s'il y a une bombe à cette position
 	if is_bomb_at(position):
-		print("Collision avec une bombe à: ", position)
-		return true
-	
+		# Pousser la bombe dans la direction du mouvement
+		push_bomb_at(position, last_move_dir)
+		print("Bombe poussée à: ", position, " dans la direction: ", last_move_dir)
+		return false  # Permettre le mouvement du joueur
+
 	var space_state = joueur.get_world_3d().direct_space_state
 	var query = PhysicsShapeQueryParameters3D.new()
 	var shape = SphereShape3D.new()
 	shape.radius = grid_size * 0.3
-	
+
 	query.shape = shape
 	query.transform.origin = position
-	
+
 	var result = space_state.intersect_shape(query)
-	
+
 	for collision in result:
 		if collision.collider != joueur:
 			print("Collision détectée à: ", position)
 			return true
-	
+
 	return false
 
 
@@ -320,6 +321,14 @@ func is_bomb_at(position: Vector3) -> bool:
 		if bomb.grid_position.distance_to(position) < grid_size * 0.5:
 			return true
 	return false
+
+
+func push_bomb_at(position: Vector3, direction: Vector3) -> void:
+	"""Pousse la bombe à une position donnée dans une direction."""
+	for bomb in bombs_placed:
+		if bomb.grid_position.distance_to(position) < grid_size * 0.5:
+			bomb.start_sliding(direction)
+			break
 
 
 func is_wall_at_position(position: Vector3) -> bool:
