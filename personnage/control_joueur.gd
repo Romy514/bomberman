@@ -528,7 +528,11 @@ func update_bonus_animation() -> void:
 		material.emission = material.albedo_color
 		material.emission_energy = 0.3
 		
-		mesh_instance.set_surface_override_material(0, material)
+		# Appliquer sur toutes les surfaces et forcer material_override pour passer devant le matériau de base
+		if mesh_instance.mesh:
+			for i in range(mesh_instance.mesh.get_surface_count()):
+				mesh_instance.set_surface_override_material(i, material)
+		mesh_instance.material_override = material
 
 
 func reset_bonus_animation() -> void:
@@ -537,4 +541,20 @@ func reset_bonus_animation() -> void:
 	for mesh_node in mesh_nodes:
 		var mesh_instance = mesh_node as MeshInstance3D
 		if mesh_instance:
-			mesh_instance.set_surface_override_material(0, null)
+			var base_material = StandardMaterial3D.new()
+			if player_id == 1:
+				base_material.albedo_color = Color(0.0, 0.4, 1.0)
+				base_material.emission_enabled = true
+				base_material.emission = Color(0.0, 0.2, 0.5)
+				base_material.emission_energy = 0.3
+			else:
+				base_material.albedo_color = Color(1.0, 0.2, 0.0)
+				base_material.emission_enabled = true
+				base_material.emission = Color(0.5, 0.1, 0.0)
+				base_material.emission_energy = 0.3
+			
+			if mesh_instance.mesh:
+				for i in range(mesh_instance.mesh.get_surface_count()):
+					mesh_instance.set_surface_override_material(i, base_material)
+			# Restaurer material_override pour ne pas rester sur le bonus
+			mesh_instance.material_override = base_material

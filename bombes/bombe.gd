@@ -18,13 +18,15 @@ var slide_direction: Vector3
 var slide_speed: float = 5.0
 
 # Références
-@onready var mesh: MeshInstance3D = $MeshInstance3D
+@onready var mesh: MeshInstance3D = null
 @onready var collision: CollisionShape3D = $CollisionShape3D
 
 
 func _ready() -> void:
 	grid_position = global_position
 	time_until_explosion = explosion_delay
+	# Chercher un MeshInstance3D même si le modèle est imbriqué
+	mesh = find_mesh_instance(self)
 	print("Bombe posée à: ", grid_position)
 
 
@@ -61,6 +63,17 @@ func update_bomb_animation() -> void:
 	var pulse = sin(get_tree().get_frame() * animation_speed) * 0.2 + 0.8
 	if mesh:
 		mesh.scale = Vector3.ONE * pulse
+
+
+func find_mesh_instance(node: Node) -> MeshInstance3D:
+	"""Recherche récursivement un MeshInstance3D dans l'arbre de nœuds."""
+	if node is MeshInstance3D:
+		return node
+	for child in node.get_children():
+		var result = find_mesh_instance(child)
+		if result != null:
+			return result
+	return null
 
 
 func handle_sliding(delta: float) -> void:
