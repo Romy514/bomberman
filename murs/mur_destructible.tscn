@@ -1,12 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://dx86xd8q3q4qw"]
+[gd_scene load_steps=6 format=3 uid="uid://dx86xd8q3q4qw"]
 
 [ext_resource type="Script" uid="uid://cki666h65rlbg" path="res://murs/mur_destructible.gd" id="1_0qlr1"]
+[ext_resource type="Texture2D" uid="uid://s714rm5jqi05" path="res://assets/wooden_planks.png" id="2_5fuuv"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0qlr1"]
 size = Vector3(2, 2, 2)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0qlr1"]
-albedo_color = Color(1, 1, 0, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u4nxv"]
+albedo_texture = ExtResource("2_5fuuv")
 
 [sub_resource type="BoxMesh" id="BoxMesh_0qlr1"]
 size = Vector3(2, 2, 2)
@@ -18,5 +19,5 @@ script = ExtResource("1_0qlr1")
 shape = SubResource("BoxShape3D_0qlr1")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_0qlr1")
+material_override = SubResource("StandardMaterial3D_u4nxv")
 mesh = SubResource("BoxMesh_0qlr1")

@@ -1,15 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://qb3yq5v1da2g"]
+[gd_scene load_steps=5 format=3 uid="uid://qb3yq5v1da2g"]
 
 [ext_resource type="Script" uid="uid://bocy3beemgqs8" path="res://bombes/bombe.gd" id="1_0qlr1"]
+[ext_resource type="PackedScene" uid="uid://dbann7y43of0x" path="res://models/bomb/bomb.glb" id="2_2ogum"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_yscbu"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0qlr1"]
-albedo_color = Color(0, 0, 0, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_0qlr1"]
-radius = 0.4
-height = 0.8
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_0qlr1"]
 radius = 0.4
@@ -18,9 +12,8 @@ radius = 0.4
 physics_material_override = SubResource("PhysicsMaterial_yscbu")
 script = ExtResource("1_0qlr1")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_0qlr1")
-mesh = SubResource("SphereMesh_0qlr1")
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_0qlr1")
+
+[node name="Sketchfab_Scene2" parent="." instance=ExtResource("2_2ogum")]
+transform = Transform3D(0.005, 0, 0, 0, 0.005, 0, 0, 0, 0.005, 0, 0, 0)

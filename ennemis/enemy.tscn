@@ -1,17 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://enemybasic001"]
+[gd_scene load_steps=6 format=3 uid="uid://ryrd8djw45aa"]
 
-[ext_resource type="Script" path="res://ennemis/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" uid="uid://caqrmxvol6kpx" path="res://ennemis/enemy.gd" id="1_enemy"]
+[ext_resource type="PackedScene" uid="uid://gctx2avua6pm" path="res://models/gnome/gnome.glb" id="3_yx0n5"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
 radius = 0.3
 height = 1.0
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
+albedo_color = Color(0.9, 0.2, 0.2, 1)
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_enemy"]
 radius = 0.3
 height = 1.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
-albedo_color = Color(0.9, 0.2, 0.2, 1)
 
 [node name="Enemy" type="CharacterBody3D"]
 script = ExtResource("1_enemy")
@@ -20,5 +21,9 @@ script = ExtResource("1_enemy")
 shape = SubResource("CapsuleShape3D_enemy")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_enemy")
+visible = false
 material_override = SubResource("StandardMaterial3D_enemy")
+mesh = SubResource("CapsuleMesh_enemy")
+
+[node name="Sketchfab_Scene" parent="." instance=ExtResource("3_yx0n5")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, -0.7, 0)
