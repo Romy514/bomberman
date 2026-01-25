@@ -75,6 +75,9 @@ func _ready() -> void:
 	# Charger la scène de bombe
 	if bomb_scene == null:
 		bomb_scene = load("res://bombes/bombe.tscn")
+	
+	# Corriger l'orientation du sprite (rotation 180 degrés)
+	joueur.rotation.y = PI
 
 
 func _process(delta: float) -> void:
@@ -281,8 +284,12 @@ func game_over() -> void:
 	is_moving = false
 	is_invincible = false
 	joueur.velocity = Vector3.ZERO
-	print("Game Over - plus de vies")
+	print("Joueur ", player_id, " éliminé - Game Over")
 	reset_invincibility_animation()
+	
+	# Indication visuelle de mort
+	show_death_indicator()
+	
 	emit_signal("game_over_signal")
 
 
@@ -388,12 +395,60 @@ func reset_invincibility_animation() -> void:
 	joueur.scale = Vector3.ONE
 
 
+func show_death_indicator() -> void:
+	"""Affiche une indication visuelle que le joueur est mort."""
+	# Rendre le joueur semi-transparent
+	var mesh_instance = find_mesh_instance(joueur)
+	if mesh_instance:
+		var material = mesh_instance.get_surface_override_material(0)
+		if material:
+			material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			material.albedo_color.a = 0.3  # Semi-transparent
+	
+	# Créer un label à plat pour être visible du dessus
+	var label = Label3D.new()
+	label.text = "✕ J" + str(player_id) + " MORT ✕"
+	label.font_size = 48
+	label.outline_size = 12
+	label.position = Vector3(0, 0.1, 0)
+	
+	# Orienter le label pour qu'il soit à plat (visible du dessus)
+	label.rotation.x = -PI / 2  # 90 degrés vers le bas
+	
+	# Couleur selon le joueur
+	if player_id == 1:
+		label.modulate = Color(0.0, 0.4, 1.0)  # Bleu
+	else:
+		label.modulate = Color(1.0, 0.2, 0.0)  # Rouge
+	
+	joueur.add_child(label)
+	
+	# Animation de pulsation du label
+	var tween = create_tween()
+	tween.set_loops()
+	tween.tween_property(label, "scale", Vector3(1.2, 1.2, 1.2), 0.5)
+	tween.tween_property(label, "scale", Vector3(1.0, 1.0, 1.0), 0.5)
+
+
+func find_mesh_instance(node: Node) -> MeshInstance3D:
+	"""Recherche récursivement un MeshInstance3D dans l'arbre de nœuds."""
+	if node is MeshInstance3D:
+		return node
+	
+	for child in node.get_children():
+		var result = find_mesh_instance(child)
+		if result != null:
+			return result
+	
+	return null
+
+
 func update_orientation(dir: Vector3) -> void:
 	"""Tourne le joueur dans la direction du déplacement."""
 	if dir == Vector3.ZERO:
 		return
-	# Godot : forward = -Z. Yaw pour faire face à la direction entrée
-	var yaw = atan2(dir.x, -dir.z)
+	# Utiliser +Z comme forward pour aligner l'animation (évite l'inversion vertical/horizontal)
+	var yaw = atan2(dir.x, dir.z)
 	joueur.rotation.y = yaw
 
 
